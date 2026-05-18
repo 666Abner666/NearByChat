@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LocalChat</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="chat">
+      <header class="topbar">
+        <div>
+          <h1>LocalChat</h1>
+          <p>Current Wi-Fi: <strong id="wifiName">Not connected</strong></p>
+        </div>
+        <span class="status">Local only</span>
+      </header>
+
+      <section class="empty" id="emptyState">
+        <h2>No messages yet</h2>
+        <p>Start a local chat with someone on the same Wi-Fi.</p>
+      </section>
+
+      <form class="composer" id="composer">
+        <input id="messageInput" type="text" placeholder="Type a message..." autocomplete="off" />
+        <button type="submit">Send</button>
+      </form>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
