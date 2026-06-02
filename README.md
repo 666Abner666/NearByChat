@@ -1,1 +1,1 @@
-# LocalChat
+# NearByChat

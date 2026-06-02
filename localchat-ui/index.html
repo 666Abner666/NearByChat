@@ -3,30 +3,63 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LocalChat</title>
+    <title>NearByChat</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <main class="chat">
-      <header class="topbar">
-        <div>
-          <h1>LocalChat</h1>
-          <p>Current Wi-Fi: <strong id="wifiName">Not connected</strong></p>
-        </div>
-        <span class="status">Local only</span>
-      </header>
+      <aside class="sidebar">
+        <header class="topbar">
+          <div>
+            <h1>NearByChat</h1>
+            <p>Current Wi-Fi: <strong id="wifiName">Loading...</strong></p>
+          </div>
+          <span class="status">Local only</span>
+        </header>
 
-      <section class="empty" id="emptyState">
-        <h2>No messages yet</h2>
-        <p>Start a local chat with someone on the same Wi-Fi.</p>
+        <section class="nearby">
+          <div class="nearby-title">
+            <h2>Online users</h2>
+            <p id="scanText">Checking...</p>
+          </div>
+
+          <div class="user-list" id="userList"></div>
+        </section>
+      </aside>
+
+      <section class="main-area">
+        <header class="chat-head">
+          <div>
+            <h2>Chat</h2>
+            <p>People on this Wi-Fi will appear on the left.</p>
+          </div>
+          <button id="clearButton" type="button" title="Clear messages"></button>
+        </header>
+
+        <section class="conversation" id="conversation">
+          <section class="empty" id="emptyState">
+            <h2>No messages yet</h2>
+            <p>Start a local chat with someone on the same Wi-Fi.</p>
+          </section>
+
+          <section class="messages" id="messages" aria-live="polite"></section>
+        </section>
+
+        <form class="composer" id="composer">
+          <div class="image-preview hidden" id="imagePreview"></div>
+          <button id="fileButton" type="button" title="Add image"></button>
+          <input id="fileInput" type="file" accept="image/*" multiple hidden />
+          <textarea
+            id="messageInput"
+            placeholder="Type a message..."
+            rows="1"
+          ></textarea>
+          <button id="sendButton" type="submit" title="Send"></button>
+        </form>
       </section>
-
-      <form class="composer" id="composer">
-        <input id="messageInput" type="text" placeholder="Type a message..." autocomplete="off" />
-        <button type="submit">Send</button>
-      </form>
     </main>
 
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
