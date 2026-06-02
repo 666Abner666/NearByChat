@@ -11,23 +11,25 @@ const conversation = document.querySelector("#conversation");
 const wifiName = document.querySelector("#wifiName");
 const scanText = document.querySelector("#scanText");
 const userList = document.querySelector("#userList");
-const clientKey = "nearbychatClientId";
-const nameKey = "nearbychatUserName";
-const usersKey = "nearbychatUsers";
-const messagesKey = "nearbychatMessages";
 let lastMessageCount = 0;
 let imageList = [];
 
-let clientId = localStorage.getItem(clientKey);
-let userName = localStorage.getItem(nameKey);
+let clientId = sessionStorage.getItem("nearbychatClientId");
+let userName = sessionStorage.getItem("nearbychatUserName");
+
+localStorage.removeItem("nearbychatUsers");
+localStorage.removeItem("nearbychatMessages");
+localStorage.removeItem("nearbychatUserName");
+localStorage.removeItem("nearbychatClientId");
 
 if (!clientId) {
   clientId = "user-" + Math.random().toString(16).slice(2);
-  localStorage.setItem(clientKey, clientId);
+  sessionStorage.setItem("nearbychatClientId", clientId);
 }
 
-if (!userName) {
+if (!userName || userName === "Student") {
   userName = "";
+  sessionStorage.removeItem("nearbychatUserName");
 }
 
 const connection = navigator.connection;
@@ -45,65 +47,6 @@ function refreshIcons() {
   if (window.lucide) {
     lucide.createIcons();
   }
-}
-
-function readSaved(key, fallback) {
-  try {
-    return JSON.parse(localStorage.getItem(key)) || fallback;
-  } catch (error) {
-    return fallback;
-  }
-}
-
-function saveSaved(key, value) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-    return true;
-  } catch (error) {
-    alert("Browser storage is full. Try clearing messages first.");
-    return false;
-  }
-}
-
-function onlineUsers() {
-  const now = Date.now();
-  return readSaved(usersKey, []).filter((user) => now - user.lastSeen < 15000);
-}
-
-function nameExists(name, id) {
-  return onlineUsers().some((user) => user.alias.toLowerCase() === name.toLowerCase() && user.id !== id);
-}
-
-function makeName(name, id) {
-  const baseName = (name || "Student").trim() || "Student";
-  let finalName = baseName;
-  let count = 2;
-
-  while (nameExists(finalName, id)) {
-    finalName = baseName + count;
-    count += 1;
-  }
-
-  return finalName;
-}
-
-function saveCurrentUser() {
-  const users = onlineUsers().filter((user) => user.id !== clientId);
-
-  if (!userName) {
-    userName = makeName("Student", clientId);
-    localStorage.setItem(nameKey, userName);
-  }
-
-  const me = {
-    id: clientId,
-    alias: userName,
-    lastSeen: Date.now(),
-  };
-
-  const nextUsers = [me, ...users];
-  saveSaved(usersKey, nextUsers);
-  return nextUsers;
 }
 
 function flashButton(button, iconName) {
@@ -177,10 +120,27 @@ function showUsers(users) {
 }
 
 async function updateOnlineUsers() {
-  const users = saveCurrentUser();
+  try {
+    const response = await fetch("/api/heartbeat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: clientId,
+        alias: userName,
+      }),
+    });
+    const result = await response.json();
+    userName = result.me.alias;
+    sessionStorage.setItem("nearbychatUserName", userName);
 
-  if (!document.activeElement.classList.contains("name-input")) {
-    showUsers(users);
+    if (!document.activeElement.classList.contains("name-input")) {
+      showUsers(result.users);
+    }
+  } catch (error) {
+    userList.innerHTML = "";
+    scanText.textContent = "Server is offline";
   }
 }
 
@@ -190,23 +150,41 @@ setInterval(updateOnlineUsers, 2000);
 async function changeName(value, errorEl) {
   const newName = value.trim();
   errorEl.textContent = "";
-  userName = makeName(newName, clientId);
-  localStorage.setItem(nameKey, userName);
+  try {
+    const response = await fetch("/api/name", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: clientId,
+        alias: newName,
+      }),
+    });
+    const result = await response.json();
 
-  const chatMessages = readSaved(messagesKey, []);
-  chatMessages.forEach((message) => {
-    if (message.senderId === clientId) {
-      message.sender = userName;
+    if (!result.ok) {
+      errorEl.textContent = result.error;
+      return;
     }
-  });
-  saveSaved(messagesKey, chatMessages);
 
-  showUsers(saveCurrentUser());
-  loadMessages();
+    userName = result.me.alias;
+    sessionStorage.setItem("nearbychatUserName", userName);
+    showUsers(result.users);
+    loadMessages();
+  } catch (error) {
+    errorEl.textContent = "Could not change name";
+  }
 }
 
 async function loadMessages() {
-  showMessages(readSaved(messagesKey, []));
+  try {
+    const response = await fetch("/api/messages");
+    const chatMessages = await response.json();
+    showMessages(chatMessages);
+  } catch (error) {
+    console.log("Could not load messages");
+  }
 }
 
 function showMessages(chatMessages) {
@@ -286,38 +264,33 @@ function showMessages(chatMessages) {
 }
 
 async function sendMessage(text) {
-  saveMessage({
-    senderId: clientId,
-    sender: userName,
-    type: "text",
-    text,
+  await fetch("/api/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      senderId: clientId,
+      sender: userName,
+      type: "text",
+      text,
+    }),
   });
 }
 
 async function sendImage(image) {
-  saveMessage({
-    senderId: clientId,
-    sender: userName,
-    type: "image",
-    image,
+  await fetch("/api/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      senderId: clientId,
+      sender: userName,
+      type: "image",
+      image,
+    }),
   });
-}
-
-function saveMessage(message) {
-  const chatMessages = readSaved(messagesKey, []);
-  chatMessages.push({
-    senderId: message.senderId,
-    sender: message.sender || "Unknown",
-    type: message.type || "text",
-    text: message.text || "",
-    image: message.image || "",
-  });
-
-  if (chatMessages.length > 100) {
-    chatMessages.splice(0, chatMessages.length - 100);
-  }
-
-  saveSaved(messagesKey, chatMessages);
 }
 
 async function copyImage(image) {
@@ -381,20 +354,18 @@ function showImagePreview() {
 }
 
 async function clearMessages() {
-  localStorage.removeItem(messagesKey);
-  localStorage.removeItem(usersKey);
-  localStorage.removeItem(nameKey);
-  localStorage.removeItem(clientKey);
-  sessionStorage.removeItem(clientKey);
-  sessionStorage.removeItem(nameKey);
-
+  await fetch("/api/clear", {
+    method: "POST",
+  });
+  sessionStorage.removeItem("nearbychatClientId");
+  sessionStorage.removeItem("nearbychatUserName");
   clientId = "user-" + Math.random().toString(16).slice(2);
+  sessionStorage.setItem("nearbychatClientId", clientId);
   userName = "";
   imageList = [];
   lastMessageCount = 0;
-  localStorage.setItem(clientKey, clientId);
   showImagePreview();
-  showMessages([]);
+  await loadMessages();
   updateOnlineUsers();
   flashButton(clearButton, "check");
 }
@@ -404,8 +375,12 @@ window.clearMessages = clearMessages;
 clearButton.addEventListener("click", clearMessages);
 
 window.addEventListener("beforeunload", () => {
-  const users = onlineUsers().filter((user) => user.id !== clientId);
-  saveSaved(usersKey, users);
+  navigator.sendBeacon(
+    "/api/logout",
+    JSON.stringify({
+      id: clientId,
+    }),
+  );
 });
 
 loadMessages();

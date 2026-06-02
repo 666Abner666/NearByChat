@@ -5,7 +5,7 @@ const os = require("os");
 
 const users = {};
 const messages = [];
-const defaultName = os.userInfo().username || "Student";
+const defaultName = os.userInfo().username || "Abner";
 
 function json(res, data) {
   res.writeHead(200, { "Content-Type": "application/json" });
@@ -107,6 +107,7 @@ http
 
     if (req.url === "/api/clear") {
       messages.length = 0;
+      Object.keys(users).forEach((id) => delete users[id]);
       return json(res, { ok: true });
     }
 
