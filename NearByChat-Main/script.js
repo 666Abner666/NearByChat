@@ -1,463 +1,387 @@
-const composer = document.querySelector("#composer");
-const input = document.querySelector("#messageInput");
-const sendButton = document.querySelector("#sendButton");
-const fileButton = document.querySelector("#fileButton");
-const clearButton = document.querySelector("#clearButton");
-const fileInput = document.querySelector("#fileInput");
-const imagePreview = document.querySelector("#imagePreview");
-const emptyState = document.querySelector("#emptyState");
-const messages = document.querySelector("#messages");
-const conversation = document.querySelector("#conversation");
-const wifiName = document.querySelector("#wifiName");
-const scanText = document.querySelector("#scanText");
-const userList = document.querySelector("#userList");
-let lastMessageCount = 0;
-let imageList = [];
+var form = document.querySelector("#composer");
+var msgInput = document.querySelector("#messageInput");
+var sendBtn = document.querySelector("#sendButton");
+var imgBtn = document.querySelector("#fileButton");
+var clearBtn = document.querySelector("#clearButton");
+var fileInput = document.querySelector("#fileInput");
+var previewBox = document.querySelector("#imagePreview");
+var emptyBox = document.querySelector("#emptyState");
+var msgBox = document.querySelector("#messages");
+var chatBox = document.querySelector("#conversation");
+var wifiText = document.querySelector("#wifiName");
+var statusText = document.querySelector("#scanText");
+var usersBox = document.querySelector("#userList");
 
-let clientId = sessionStorage.getItem("nearbychatClientId");
-let userName = sessionStorage.getItem("nearbychatUserName");
+var myId = sessionStorage.getItem("nearbychatClientId");
+var myName = sessionStorage.getItem("nearbychatUserName") || "";
+var ws = null;
+var allMessages = [];
+var selectedImages = [];
 
-localStorage.removeItem("nearbychatUsers");
-localStorage.removeItem("nearbychatMessages");
-localStorage.removeItem("nearbychatUserName");
-localStorage.removeItem("nearbychatClientId");
-
-if (!clientId) {
-  clientId = "user-" + Math.random().toString(16).slice(2);
-  sessionStorage.setItem("nearbychatClientId", clientId);
+if (!myId) {
+  myId = "user-" + Math.random().toString(16).slice(2);
+  sessionStorage.setItem("nearbychatClientId", myId);
 }
 
-if (!userName || userName === "Student") {
-  userName = "";
-  sessionStorage.removeItem("nearbychatUserName");
-}
-
-const connection = navigator.connection;
-if (connection?.effectiveType) {
-  wifiName.textContent = connection.effectiveType;
+if (navigator.connection) {
+  wifiText.textContent = navigator.connection.effectiveType;
 } else {
-  wifiName.textContent = "Unknown";
+  wifiText.textContent = "Browser";
 }
 
-function icon(name) {
+function makeIcon(name) {
   return '<i data-lucide="' + name + '"></i>';
 }
 
-function refreshIcons() {
-  if (window.lucide) {
-    lucide.createIcons();
+function drawIcons() {
+  if (window.lucide) lucide.createIcons();
+}
+
+imgBtn.innerHTML = makeIcon("image");
+sendBtn.innerHTML = makeIcon("send");
+clearBtn.innerHTML = makeIcon("trash-2");
+drawIcons();
+
+function flash(btn, iconName) {
+  var old = btn.innerHTML;
+  btn.innerHTML = makeIcon(iconName);
+  btn.classList.add("clicked");
+  drawIcons();
+
+  setTimeout(function () {
+    btn.innerHTML = old;
+    btn.classList.remove("clicked");
+    drawIcons();
+  }, 700);
+}
+
+function sendToServer(obj) {
+  // console.log("sending toserver:", obj);
+  if (ws && ws.readyState == WebSocket.OPEN) {
+    ws.send(JSON.stringify(obj));
   }
 }
 
-function flashButton(button, iconName) {
-  const oldHtml = button.innerHTML;
-  button.innerHTML = icon(iconName);
-  button.classList.add("clicked");
-  refreshIcons();
+function startChat() {
+  var start = location.protocol == "https:" ? "wss://" : "ws://";
+  ws = new WebSocket(start + location.host + "/api/chat");
+  statusText.textContent = "Connecting...";
 
-  setTimeout(() => {
-    button.innerHTML = oldHtml;
-    button.classList.remove("clicked");
-    refreshIcons();
-  }, 800);
+  ws.onopen = function () {
+    // console.log("websocket opened");
+    sendToServer({
+      type: "hello",
+      id: myId,
+      alias: myName,
+    });
+  };
+
+  ws.onmessage = function (event) {
+    var data = JSON.parse(event.data);
+    // console.log("got message:", data);
+
+    if (data.type == "me") {
+      myName = data.me.alias;
+      sessionStorage.setItem("nearbychatUserName", myName);
+      drawUsers(data.users);
+    }
+
+    if (data.type == "users") {
+      drawUsers(data.users);
+    }
+
+    if (data.type == "message") {
+      allMessages.push(data.message);
+      drawMessages();
+    }
+
+    if (data.type == "clear") {
+      allMessages = [];
+      selectedImages = [];
+      drawPreview();
+      drawMessages();
+    }
+  };
+
+  ws.onclose = function () {
+    usersBox.innerHTML = "";
+    statusText.textContent = "Disconnected";
+    setTimeout(startChat, 1500);
+  };
 }
 
-fileButton.innerHTML = icon("image");
-sendButton.innerHTML = icon("send");
-clearButton.innerHTML = icon("trash-2");
-refreshIcons();
+function drawUsers(users) {
+  usersBox.innerHTML = "";
 
-function showUsers(users) {
-  userList.innerHTML = "";
-
-  if (users.length === 0) {
-    scanText.textContent = "No one online yet";
+  if (users.length == 0) {
+    statusText.textContent = "No one online yet";
     return;
   }
 
-  scanText.textContent = users.length + " online";
+  statusText.textContent = users.length + " online";
 
-  users.forEach((user) => {
-    const card = document.createElement("div");
+  for (var i = 0; i < users.length; i++) {
+    var user = users[i];
+    var card = document.createElement("div");
+    var left = document.createElement("div");
+    var small = document.createElement("small");
+
     card.className = "user-card";
-    if (user.id === clientId) {
-      card.classList.add("me");
-    }
+    small.textContent = user.id == myId ? "You" : "Online";
 
-    const nameBox = document.createElement("div");
-    const online = document.createElement("small");
+    if (user.id == myId) {
+      card.className = "user-card me";
+      left.className = "edit-name";
 
-    online.textContent = user.id === clientId ? "You" : "Online";
+      var input = document.createElement("input");
+      input.className = "name-input";
+      input.value = myName;
 
-    if (user.id === clientId) {
-      const nameInput = document.createElement("input");
-      const error = document.createElement("span");
+      input.onchange = function () {
+        myName = this.value.trim();
+        sendToServer({ type: "name", alias: myName });
+      };
 
-      nameBox.className = "edit-name";
-      nameInput.className = "name-input";
-      nameInput.value = userName;
-
-      nameInput.addEventListener("change", () => {
-        changeName(nameInput.value, error);
-      });
-      nameInput.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
+      input.onkeydown = function (event) {
+        if (event.key == "Enter") {
           event.preventDefault();
-          nameInput.blur();
+          this.blur();
         }
-      });
+      };
 
-      nameBox.append(nameInput, error);
+      left.append(input);
     } else {
-      const name = document.createElement("strong");
-      name.textContent = user.alias || "Unknown user";
-      nameBox.append(name);
+      var name = document.createElement("strong");
+      name.textContent = user.alias;
+      left.append(name);
     }
 
-    card.append(nameBox, online);
-    userList.append(card);
-  });
-}
-
-async function updateOnlineUsers() {
-  try {
-    const response = await fetch("/api/heartbeat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: clientId,
-        alias: userName,
-      }),
-    });
-    const result = await response.json();
-    userName = result.me.alias;
-    sessionStorage.setItem("nearbychatUserName", userName);
-
-    if (!document.activeElement.classList.contains("name-input")) {
-      showUsers(result.users);
-    }
-  } catch (error) {
-    userList.innerHTML = "";
-    scanText.textContent = "Server is offline";
+    card.append(left, small);
+    usersBox.append(card);
   }
 }
 
-updateOnlineUsers();
-setInterval(updateOnlineUsers, 2000);
+function drawMessages() {
+  msgBox.innerHTML = "";
 
-async function changeName(value, errorEl) {
-  const newName = value.trim();
-  errorEl.textContent = "";
-  try {
-    const response = await fetch("/api/name", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: clientId,
-        alias: newName,
-      }),
-    });
-    const result = await response.json();
-
-    if (!result.ok) {
-      errorEl.textContent = result.error;
-      return;
-    }
-
-    userName = result.me.alias;
-    sessionStorage.setItem("nearbychatUserName", userName);
-    showUsers(result.users);
-    loadMessages();
-  } catch (error) {
-    errorEl.textContent = "Could not change name";
-  }
-}
-
-async function loadMessages() {
-  try {
-    const response = await fetch("/api/messages");
-    const chatMessages = await response.json();
-    showMessages(chatMessages);
-  } catch (error) {
-    console.log("Could not load messages");
-  }
-}
-
-function showMessages(chatMessages) {
-  const hadNewMessage = chatMessages.length > lastMessageCount;
-  const wasNearBottom = conversation.scrollTop + conversation.clientHeight >= conversation.scrollHeight - 80;
-
-  messages.innerHTML = "";
-
-  if (chatMessages.length === 0) {
-    emptyState.classList.remove("hidden");
-    messages.classList.remove("active");
-    lastMessageCount = 0;
+  if (allMessages.length == 0) {
+    emptyBox.classList.remove("hidden");
+    msgBox.classList.remove("active");
     return;
   }
 
-  emptyState.classList.add("hidden");
-  messages.classList.add("active");
+  emptyBox.classList.add("hidden");
+  msgBox.classList.add("active");
 
-  chatMessages.forEach((chatMessage) => {
-    const message = document.createElement("div");
-    const sender = document.createElement("strong");
+  for (var i = 0; i < allMessages.length; i++) {
+    var item = allMessages[i];
+    var row = document.createElement("div");
+    var who = document.createElement("strong");
 
-    message.className = chatMessage.senderId === clientId ? "message mine" : "message other";
-    sender.textContent = chatMessage.sender;
+    if (item.senderId == myId) row.className = "message mine";
+    else row.className = "message other";
 
-    message.append(sender);
+    who.textContent = item.sender;
+    row.append(who);
 
-    if (chatMessage.type === "image") {
-      const imageLine = document.createElement("div");
-      const image = document.createElement("img");
-      const copyButton = document.createElement("button");
+    if (item.type == "image") {
+      var imgLine = document.createElement("div");
+      var img = document.createElement("img");
+      var copyImg = document.createElement("button");
 
-      imageLine.className = "image-line";
-      image.className = "chat-image";
-      image.src = chatMessage.image;
-      copyButton.type = "button";
-      copyButton.className = "icon-button copy-button";
-      copyButton.innerHTML = icon("copy");
-      copyButton.title = "Copy image";
-      copyButton.addEventListener("click", () => {
-        copyImage(chatMessage.image);
-        flashButton(copyButton, "check");
-      });
+      imgLine.className = "image-line";
+      img.className = "chat-image";
+      img.src = item.image;
+      copyImg.type = "button";
+      copyImg.className = "icon-button copy-button";
+      copyImg.innerHTML = makeIcon("copy");
+      copyImg.title = "Copy image";
 
-      imageLine.append(image, copyButton);
-      message.append(imageLine);
+      copyImg.onclick = (function (image, button) {
+        return function () {
+          copyImage(image);
+          flash(button, "check");
+        };
+      })(item.image, copyImg);
+
+      imgLine.append(img, copyImg);
+      row.append(imgLine);
     } else {
-      const textLine = document.createElement("div");
-      const text = document.createElement("p");
-      const copyButton = document.createElement("button");
+      var textLine = document.createElement("div");
+      var text = document.createElement("p");
+      var copyText = document.createElement("button");
 
       textLine.className = "text-line";
-      text.textContent = chatMessage.text;
-      copyButton.type = "button";
-      copyButton.className = "icon-button copy-button";
-      copyButton.innerHTML = icon("copy");
-      copyButton.title = "Copy text";
-      copyButton.addEventListener("click", () => {
-        navigator.clipboard.writeText(chatMessage.text);
-        flashButton(copyButton, "check");
-      });
+      text.textContent = item.text;
+      copyText.type = "button";
+      copyText.className = "icon-button copy-button";
+      copyText.innerHTML = makeIcon("copy");
+      copyText.title = "Copy text";
 
-      textLine.append(text, copyButton);
-      message.append(textLine);
+      copyText.onclick = (function (msg, button) {
+        return function () {
+          navigator.clipboard.writeText(msg);
+          flash(button, "check");
+        };
+      })(item.text, copyText);
+
+      textLine.append(text, copyText);
+      row.append(textLine);
     }
 
-    messages.append(message);
-  });
-
-  if (wasNearBottom || hadNewMessage) {
-    requestAnimationFrame(() => {
-      conversation.scrollTop = conversation.scrollHeight;
-    });
+    msgBox.append(row);
   }
-  lastMessageCount = chatMessages.length;
-  refreshIcons();
-}
 
-async function sendMessage(text) {
-  await fetch("/api/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      senderId: clientId,
-      sender: userName,
-      type: "text",
-      text,
-    }),
-  });
-}
-
-async function sendImage(image) {
-  await fetch("/api/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      senderId: clientId,
-      sender: userName,
-      type: "image",
-      image,
-    }),
-  });
+  chatBox.scrollTop = chatBox.scrollHeight;
+  drawIcons();
 }
 
 async function copyImage(image) {
   try {
-    const response = await fetch(image);
-    const blob = await response.blob();
+    var res = await fetch(image);
+    var blob = await res.blob();
     await navigator.clipboard.write([
       new ClipboardItem({
         [blob.type]: blob,
       }),
     ]);
-  } catch (error) {
+  } catch (e) {
     navigator.clipboard.writeText(image);
   }
 }
 
-function resizeInput() {
-  input.style.height = "auto";
-  input.style.height = Math.min(input.scrollHeight, 130) + "px";
+function resizeBox() {
+  msgInput.style.height = "auto";
+  msgInput.style.height = Math.min(msgInput.scrollHeight, 130) + "px";
 }
 
-function readImage(file) {
-  const reader = new FileReader();
-  reader.onload = () => {
-    imageList.push(reader.result);
-    showImagePreview();
+function addImage(file) {
+  var reader = new FileReader();
+  reader.onload = function () {
+    selectedImages.push(reader.result);
+    drawPreview();
   };
   reader.readAsDataURL(file);
 }
 
-function showImagePreview() {
-  imagePreview.innerHTML = "";
+function drawPreview() {
+  previewBox.innerHTML = "";
 
-  if (imageList.length === 0) {
-    imagePreview.classList.add("hidden");
+  if (selectedImages.length == 0) {
+    previewBox.classList.add("hidden");
     return;
   }
 
-  imagePreview.classList.remove("hidden");
+  previewBox.classList.remove("hidden");
 
-  imageList.forEach((image, index) => {
-    const item = document.createElement("div");
-    const thumb = document.createElement("img");
-    const remove = document.createElement("button");
+  for (var i = 0; i < selectedImages.length; i++) {
+    var wrap = document.createElement("div");
+    var thumb = document.createElement("img");
+    var del = document.createElement("button");
 
-    item.className = "preview-item";
-    thumb.src = image;
-    remove.type = "button";
-    remove.innerHTML = icon("x");
-    remove.title = "Remove image";
-    remove.addEventListener("click", () => {
-      imageList.splice(index, 1);
-      showImagePreview();
-    });
+    wrap.className = "preview-item";
+    thumb.src = selectedImages[i];
+    del.type = "button";
+    del.innerHTML = makeIcon("x");
+    del.title = "Remove image";
 
-    item.append(thumb, remove);
-    imagePreview.append(item);
-  });
+    del.onclick = (function (num) {
+      return function () {
+        selectedImages.splice(num, 1);
+        drawPreview();
+      };
+    })(i);
 
-  refreshIcons();
-}
-
-async function clearMessages() {
-  await fetch("/api/clear", {
-    method: "POST",
-  });
-  sessionStorage.removeItem("nearbychatClientId");
-  sessionStorage.removeItem("nearbychatUserName");
-  clientId = "user-" + Math.random().toString(16).slice(2);
-  sessionStorage.setItem("nearbychatClientId", clientId);
-  userName = "";
-  imageList = [];
-  lastMessageCount = 0;
-  showImagePreview();
-  await loadMessages();
-  updateOnlineUsers();
-  flashButton(clearButton, "check");
-}
-
-window.clearMessages = clearMessages;
-
-clearButton.addEventListener("click", clearMessages);
-
-window.addEventListener("beforeunload", () => {
-  navigator.sendBeacon(
-    "/api/logout",
-    JSON.stringify({
-      id: clientId,
-    }),
-  );
-});
-
-loadMessages();
-setInterval(loadMessages, 1000);
-
-input.addEventListener("input", resizeInput);
-
-input.addEventListener("keydown", (event) => {
-  if (event.key === "Enter" && !event.shiftKey) {
-    event.preventDefault();
-    sendCurrentMessage();
+    wrap.append(thumb, del);
+    previewBox.append(wrap);
   }
-});
 
-input.addEventListener("paste", (event) => {
-  const items = event.clipboardData.items;
+  drawIcons();
+}
 
-  for (let i = 0; i < items.length; i += 1) {
-    const item = items[i];
+function clearAll() {
+  allMessages = [];
+  selectedImages = [];
+  drawPreview();
+  drawMessages();
+  sendToServer({ type: "clear" });
+  flash(clearBtn, "check");
+}
 
-    if (item.type.startsWith("image/")) {
-      const file = item.getAsFile();
+function sendMessage() {
+  var text = msgInput.value.trim();
+  // console.log("text:", text, "images:", selectedImages.length);
+  if (!text && selectedImages.length == 0) return;
+
+  if (text) {
+    sendToServer({
+      type: "message",
+      message: {
+        type: "text",
+        text: text,
+      },
+    });
+  }
+
+  for (var i = 0; i < selectedImages.length; i++) {
+    sendToServer({
+      type: "message",
+      message: {
+        type: "image",
+        image: selectedImages[i],
+      },
+    });
+  }
+
+  selectedImages = [];
+  drawPreview();
+  msgInput.value = "";
+  resizeBox();
+  flash(sendBtn, "check");
+}
+
+clearBtn.onclick = clearAll;
+imgBtn.onclick = function () {
+  fileInput.click();
+};
+
+msgInput.oninput = resizeBox;
+msgInput.onkeydown = function (event) {
+  if (event.key == "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    sendMessage();
+  }
+};
+
+msgInput.onpaste = function (event) {
+  var items = event.clipboardData.items;
+
+  for (var i = 0; i < items.length; i++) {
+    if (items[i].type.startsWith("image/")) {
+      var file = items[i].getAsFile();
       if (file) {
         event.preventDefault();
-        readImage(file);
-        flashButton(fileButton, "check");
+        addImage(file);
+        flash(imgBtn, "check");
       }
     }
   }
-});
+};
 
-fileButton.addEventListener("click", () => {
-  fileInput.click();
-});
-
-fileInput.addEventListener("change", () => {
-  const files = Array.from(fileInput.files);
-
-  files.forEach((file) => {
-    if (file.type.startsWith("image/")) {
-      readImage(file);
+fileInput.onchange = function () {
+  for (var i = 0; i < fileInput.files.length; i++) {
+    if (fileInput.files[i].type.startsWith("image/")) {
+      addImage(fileInput.files[i]);
     }
-  });
-
-  if (files.length > 0) {
-    flashButton(fileButton, "check");
   }
 
+  if (fileInput.files.length > 0) flash(imgBtn, "check");
   fileInput.value = "";
-});
+};
 
-composer.addEventListener("submit", (event) => {
+form.onsubmit = function (event) {
   event.preventDefault();
-  sendCurrentMessage();
-});
+  sendMessage();
+};
 
-// sendButton.addEventListener("click", () => {
-//   const text = input.value.trim();
-//   if (text) sendMessage(text);
-// });
-
-async function sendCurrentMessage() {
-  const text = input.value.trim();
-  if (!text && imageList.length === 0) return;
-
-  if (text) {
-    await sendMessage(text);
-  }
-
-  for (let i = 0; i < imageList.length; i += 1) {
-    await sendImage(imageList[i]);
-  }
-
-  imageList = [];
-  showImagePreview();
-  await loadMessages();
-  input.value = "";
-  resizeInput();
-  flashButton(sendButton, "check");
-}
+startChat();

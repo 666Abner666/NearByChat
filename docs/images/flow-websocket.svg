@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect x="0" y="0" width="1280" height="720" fill="#f6f8fb"/><defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#2f7cf6"/></marker></defs>
+  <text x="640" y="48" text-anchor="middle" font-family="Arial, sans-serif" font-size="30" font-weight="800" fill="#172033">WebSocket Message Flow</text>
+  <rect x="60" y="120" width="230" height="100" rx="10" fill="#ffffff" stroke="#24324a" stroke-width="2"/>
+  <text x="175" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#172033">User A Browser</text>
+  <text x="175" y="180" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#40506a">connects to /api/chat</text>
+  <rect x="525" y="120" width="230" height="100" rx="10" fill="#f0fff4" stroke="#24324a" stroke-width="2"/>
+  <text x="640" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#172033">ChatRoom Object</text>
+  <text x="640" y="180" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#40506a">stores people array</text><text x="640" y="202" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#40506a">broadcasts events</text>
+  <rect x="990" y="120" width="230" height="100" rx="10" fill="#ffffff" stroke="#24324a" stroke-width="2"/>
+  <text x="1105" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#172033">User B Browser</text>
+  <text x="1105" y="180" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#40506a">same IP room receives</text>
+  <line x1="290" y1="170" x2="525" y2="170" stroke="#2f7cf6" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="407.5" y="162" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#1f5fc4">hello { id, alias }</text><line x1="755" y1="170" x2="990" y2="170" stroke="#2f7cf6" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="872.5" y="162" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#1f5fc4">users / me</text>
+  <rect x="60" y="310" width="230" height="100" rx="10" fill="#eef5ff" stroke="#24324a" stroke-width="2"/>
+  <text x="175" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#172033">Send message</text>
+  <text x="175" y="370" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#40506a">type: message</text><text x="175" y="392" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#40506a">text or image data</text>
+  <rect x="525" y="310" width="230" height="100" rx="10" fill="#eef5ff" stroke="#24324a" stroke-width="2"/>
+  <text x="640" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#172033">Broadcast</text>
+  <text x="640" y="370" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#40506a">senderId, sender</text><text x="640" y="392" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#40506a">type, text, image</text>
+  <rect x="990" y="310" width="230" height="100" rx="10" fill="#eef5ff" stroke="#24324a" stroke-width="2"/>
+  <text x="1105" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#172033">Render UI</text>
+  <text x="1105" y="370" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#40506a">mine / other bubble</text><text x="1105" y="392" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#40506a">copy button, auto-scroll</text>
+  <line x1="290" y1="360" x2="525" y2="360" stroke="#2f7cf6" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="407.5" y="352" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#1f5fc4">message</text><line x1="755" y1="360" x2="990" y2="360" stroke="#2f7cf6" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="872.5" y="352" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#1f5fc4">message</text>
+  <rect x="60" y="500" width="230" height="100" rx="10" fill="#fff8e8" stroke="#24324a" stroke-width="2"/>
+  <text x="175" y="530" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#172033">Rename/Clear</text>
+  <text x="175" y="560" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#40506a">type: name</text><text x="175" y="582" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#40506a">type: clear</text>
+  <rect x="525" y="500" width="230" height="100" rx="10" fill="#fff8e8" stroke="#24324a" stroke-width="2"/>
+  <text x="640" y="530" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#172033">Update State</text>
+  <text x="640" y="560" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#40506a">make unique alias</text><text x="640" y="582" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#40506a">reset messages</text>
+  <rect x="990" y="500" width="230" height="100" rx="10" fill="#fff8e8" stroke="#24324a" stroke-width="2"/>
+  <text x="1105" y="530" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#172033">Refresh Page State</text>
+  <text x="1105" y="560" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#40506a">users list</text><text x="1105" y="582" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#40506a">empty chat state</text>
+  <line x1="290" y1="550" x2="525" y2="550" stroke="#2f7cf6" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="407.5" y="542" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#1f5fc4">name / clear</text><line x1="755" y1="550" x2="990" y2="550" stroke="#2f7cf6" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="872.5" y="542" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#1f5fc4">users / clear</text>
+</svg>

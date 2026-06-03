@@ -1,0 +1,13 @@
+flowchart LR
+  Browser["Browser UI<br/>index.html + style.css + script.js"]
+  Worker["Cloudflare Worker<br/>src/worker.js"]
+  Room["Durable Object<br/>CHAT_ROOM / ChatRoom"]
+  Assets["Static Assets<br/>NearByChat-Main/"]
+  Wrangler["wrangler.jsonc<br/>route + assets + DO migration"]
+
+  Browser -->|"HTTPS / WSS"| Worker
+  Worker -->|"env.ASSETS.fetch()"| Assets
+  Worker -->|"CHAT_ROOM.idFromName()"| Room
+  Wrangler --> Worker
+  Wrangler --> Assets
+  Wrangler --> Room

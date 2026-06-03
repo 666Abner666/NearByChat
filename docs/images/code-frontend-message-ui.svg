@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1220" height="3350" viewBox="0 0 1220 3350">
+  <rect width="100%" height="100%" fill="#f2f4f8"/>
+  <rect x="20" y="20" width="1180" height="3310" rx="12" fill="#101827" stroke="#263247"/>
+  <rect x="20" y="20" width="1180" height="44" rx="12" fill="#172235"/>
+  <circle cx="42" cy="42" r="6" fill="#ff5f57"/><circle cx="62" cy="42" r="6" fill="#febc2e"/><circle cx="82" cy="42" r="6" fill="#28c840"/>
+  <text x="104" y="47" fill="#e9eef8" font-family="Arial, sans-serif" font-size="16" font-weight="700">Frontend user list and message rendering</text>
+  <text x="1186" y="47" fill="#92a2ba" font-family="Arial, sans-serif" font-size="14" text-anchor="end">NearByChat-Main/script.js:117-246</text>
+  <text x="34" y="92" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">117  function showUsers(users) {</text>
+  <text x="34" y="117" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">118    userList.innerHTML = "";</text>
+  <text x="34" y="142" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">119  </text>
+  <text x="34" y="167" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">120    if (users.length === 0) {</text>
+  <text x="34" y="192" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">121      scanText.textContent = "No one online yet";</text>
+  <text x="34" y="217" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">122      return;</text>
+  <text x="34" y="242" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">123    }</text>
+  <text x="34" y="267" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">124  </text>
+  <text x="34" y="292" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">125    scanText.textContent = users.length + " online";</text>
+  <text x="34" y="317" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">126  </text>
+  <text x="34" y="342" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">127    users.forEach((user) =&gt; {</text>
+  <text x="34" y="367" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">128      const card = document.createElement("div");</text>
+  <text x="34" y="392" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">129      const nameBox = document.createElement("div");</text>
+  <text x="34" y="417" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">130      const online = document.createElement("small");</text>
+  <text x="34" y="442" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">131  </text>
+  <text x="34" y="467" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">132      card.className = "user-card";</text>
+  <text x="34" y="492" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">133      online.textContent = user.id === clientId ? "You" : "Online";</text>
+  <text x="34" y="517" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">134  </text>
+  <text x="34" y="542" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">135      if (user.id === clientId) {</text>
+  <text x="34" y="567" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">136        card.classList.add("me");</text>
+  <text x="34" y="592" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">137        nameBox.className = "edit-name";</text>
+  <text x="34" y="617" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">138  </text>
+  <text x="34" y="642" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">139        const nameInput = document.createElement("input");</text>
+  <text x="34" y="667" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">140        const error = document.createElement("span");</text>
+  <text x="34" y="692" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">141        nameInput.className = "name-input";</text>
+  <text x="34" y="717" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">142        nameInput.value = userName;</text>
+  <text x="34" y="742" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">143  </text>
+  <text x="34" y="767" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">144        nameInput.addEventListener("change", () =&gt; {</text>
+  <text x="34" y="792" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">145          changeName(nameInput.value, error);</text>
+  <text x="34" y="817" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">146        });</text>
+  <text x="34" y="842" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">147        nameInput.addEventListener("keydown", (event) =&gt; {</text>
+  <text x="34" y="867" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">148          if (event.key === "Enter") {</text>
+  <text x="34" y="892" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">149            event.preventDefault();</text>
+  <text x="34" y="917" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">150            nameInput.blur();</text>
+  <text x="34" y="942" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">151          }</text>
+  <text x="34" y="967" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">152        });</text>
+  <text x="34" y="992" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">153  </text>
+  <text x="34" y="1017" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">154        nameBox.append(nameInput, error);</text>
+  <text x="34" y="1042" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">155      } else {</text>
+  <text x="34" y="1067" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">156        const name = document.createElement("strong");</text>
+  <text x="34" y="1092" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">157        name.textContent = user.alias || "Unknown user";</text>
+  <text x="34" y="1117" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">158        nameBox.append(name);</text>
+  <text x="34" y="1142" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">159      }</text>
+  <text x="34" y="1167" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">160  </text>
+  <text x="34" y="1192" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">161      card.append(nameBox, online);</text>
+  <text x="34" y="1217" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">162      userList.append(card);</text>
+  <text x="34" y="1242" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">163    });</text>
+  <text x="34" y="1267" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">164  }</text>
+  <text x="34" y="1292" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">165  </text>
+  <text x="34" y="1317" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">166  function changeName(value, errorEl) {</text>
+  <text x="34" y="1342" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">167    const newName = value.trim();</text>
+  <text x="34" y="1367" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">168    errorEl.textContent = "";</text>
+  <text x="34" y="1392" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">169    send({ type: "name", alias: newName });</text>
+  <text x="34" y="1417" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">170  }</text>
+  <text x="34" y="1442" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">171  </text>
+  <text x="34" y="1467" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">172  function showMessages(list) {</text>
+  <text x="34" y="1492" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">173    const hadNewMessage = list.length &gt; lastMessageCount;</text>
+  <text x="34" y="1517" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">174    const wasNearBottom = conversation.scrollTop + conversation.clientHeight &gt;= conversation.scrollHeight - 80;</text>
+  <text x="34" y="1542" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">175  </text>
+  <text x="34" y="1567" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">176    messages.innerHTML = "";</text>
+  <text x="34" y="1592" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">177  </text>
+  <text x="34" y="1617" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">178    if (list.length === 0) {</text>
+  <text x="34" y="1642" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">179      emptyState.classList.remove("hidden");</text>
+  <text x="34" y="1667" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">180      messages.classList.remove("active");</text>
+  <text x="34" y="1692" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">181      lastMessageCount = 0;</text>
+  <text x="34" y="1717" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">182      return;</text>
+  <text x="34" y="1742" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">183    }</text>
+  <text x="34" y="1767" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">184  </text>
+  <text x="34" y="1792" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">185    emptyState.classList.add("hidden");</text>
+  <text x="34" y="1817" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">186    messages.classList.add("active");</text>
+  <text x="34" y="1842" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">187  </text>
+  <text x="34" y="1867" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">188    list.forEach((chatMessage) =&gt; {</text>
+  <text x="34" y="1892" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">189      const message = document.createElement("div");</text>
+  <text x="34" y="1917" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">190      const sender = document.createElement("strong");</text>
+  <text x="34" y="1942" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">191  </text>
+  <text x="34" y="1967" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">192      message.className = chatMessage.senderId === clientId ? "message mine" : "message other";</text>
+  <text x="34" y="1992" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">193      sender.textContent = chatMessage.sender;</text>
+  <text x="34" y="2017" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">194      message.append(sender);</text>
+  <text x="34" y="2042" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">195  </text>
+  <text x="34" y="2067" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">196      if (chatMessage.type === "image") {</text>
+  <text x="34" y="2092" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">197        const imageLine = document.createElement("div");</text>
+  <text x="34" y="2117" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">198        const image = document.createElement("img");</text>
+  <text x="34" y="2142" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">199        const copyButton = document.createElement("button");</text>
+  <text x="34" y="2167" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">200  </text>
+  <text x="34" y="2192" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">201        imageLine.className = "image-line";</text>
+  <text x="34" y="2217" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">202        image.className = "chat-image";</text>
+  <text x="34" y="2242" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">203        image.src = chatMessage.image;</text>
+  <text x="34" y="2267" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">204        copyButton.type = "button";</text>
+  <text x="34" y="2292" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">205        copyButton.className = "icon-button copy-button";</text>
+  <text x="34" y="2317" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">206        copyButton.innerHTML = icon("copy");</text>
+  <text x="34" y="2342" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">207        copyButton.title = "Copy image";</text>
+  <text x="34" y="2367" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">208        copyButton.addEventListener("click", () =&gt; {</text>
+  <text x="34" y="2392" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">209          copyImage(chatMessage.image);</text>
+  <text x="34" y="2417" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">210          flashButton(copyButton, "check");</text>
+  <text x="34" y="2442" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">211        });</text>
+  <text x="34" y="2467" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">212  </text>
+  <text x="34" y="2492" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">213        imageLine.append(image, copyButton);</text>
+  <text x="34" y="2517" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">214        message.append(imageLine);</text>
+  <text x="34" y="2542" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">215      } else {</text>
+  <text x="34" y="2567" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">216        const textLine = document.createElement("div");</text>
+  <text x="34" y="2592" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">217        const text = document.createElement("p");</text>
+  <text x="34" y="2617" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">218        const copyButton = document.createElement("button");</text>
+  <text x="34" y="2642" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">219  </text>
+  <text x="34" y="2667" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">220        textLine.className = "text-line";</text>
+  <text x="34" y="2692" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">221        text.textContent = chatMessage.text;</text>
+  <text x="34" y="2717" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">222        copyButton.type = "button";</text>
+  <text x="34" y="2742" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">223        copyButton.className = "icon-button copy-button";</text>
+  <text x="34" y="2767" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">224        copyButton.innerHTML = icon("copy");</text>
+  <text x="34" y="2792" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">225        copyButton.title = "Copy text";</text>
+  <text x="34" y="2817" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">226        copyButton.addEventListener("click", () =&gt; {</text>
+  <text x="34" y="2842" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">227          navigator.clipboard.writeText(chatMessage.text);</text>
+  <text x="34" y="2867" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">228          flashButton(copyButton, "check");</text>
+  <text x="34" y="2892" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">229        });</text>
+  <text x="34" y="2917" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">230  </text>
+  <text x="34" y="2942" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">231        textLine.append(text, copyButton);</text>
+  <text x="34" y="2967" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">232        message.append(textLine);</text>
+  <text x="34" y="2992" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">233      }</text>
+  <text x="34" y="3017" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">234  </text>
+  <text x="34" y="3042" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">235      messages.append(message);</text>
+  <text x="34" y="3067" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">236    });</text>
+  <text x="34" y="3092" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">237  </text>
+  <text x="34" y="3117" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">238    if (wasNearBottom || hadNewMessage) {</text>
+  <text x="34" y="3142" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">239      requestAnimationFrame(() =&gt; {</text>
+  <text x="34" y="3167" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">240        conversation.scrollTop = conversation.scrollHeight;</text>
+  <text x="34" y="3192" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">241      });</text>
+  <text x="34" y="3217" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">242    }</text>
+  <text x="34" y="3242" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">243  </text>
+  <text x="34" y="3267" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">244    lastMessageCount = list.length;</text>
+  <text x="34" y="3292" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">245    refreshIcons();</text>
+  <text x="34" y="3317" fill="#d8e2f3" font-family="Menlo, Consolas, Monaco, monospace" font-size="17">246  }</text>
+</svg>

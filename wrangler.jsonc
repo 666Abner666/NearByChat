@@ -1,0 +1,28 @@
+{
+  "name": "nearbychat",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-06-02",
+  "assets": {
+    "directory": "./NearByChat-Main"
+  },
+  "routes": [
+    {
+      "pattern": "chat.abnerc.com/*",
+      "zone_name": "abnerc.com"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "CHAT_ROOM",
+        "class_name": "ChatRoom"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["ChatRoom"]
+    }
+  ]
+}
